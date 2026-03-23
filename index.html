@@ -628,7 +628,11 @@ footer strong{color:#aaa}
     </div>
 
     <!-- 메시지 목록 -->
-    <div id="msg-list"></div>
+    <div id="msg-count-badge" style="font-size:13px;color:#888;text-align:right;margin-bottom:8px"></div>
+    <div id="msg-list" style="border-radius:12px;overflow:hidden;border:1px solid #eef2ff"></div>
+    <div style="text-align:center;margin-top:12px">
+      <button id="msg-more-btn" onclick="msgShown+=10;renderMsgs(msgAllData,msgShown)" style="display:none;padding:9px 28px;background:#f0f4ff;color:#162583;border:1px solid #c3d4ff;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer">+ 더보기</button>
+    </div>
   </div>
 </section>
 
@@ -775,26 +779,37 @@ updateCD();
 setInterval(updateCD, 1000);
 
 // 메시지
+var msgAllData = [];
+var msgShown = 10;
+function renderMsgs(data, count) {
+  var list = document.getElementById('msg-list');
+  if (!list) return;
+  var items = data.slice(0, count);
+  list.innerHTML = items.length ? items.map(function(m) {
+    var dt = m.created_at.substring(0,10);
+    var initial = m.name.charAt(0);
+    var safe = m.message.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #eef2ff;background:#fff">' +
+      '<div style="min-width:28px;height:28px;background:#162583;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0">' + initial + '</div>' +
+      '<strong style="font-size:13px;color:#162583;white-space:nowrap;flex-shrink:0">' + m.name + '</strong>' +
+      (m.region ? '<span style="font-size:11px;color:#888;background:#eef2ff;padding:1px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0">' + m.region + '</span>' : '') +
+      '<span style="font-size:13px;color:#444;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1">' + safe + '</span>' +
+      '<span style="font-size:11px;color:#bbb;white-space:nowrap;flex-shrink:0">' + dt + '</span>' +
+      '</div>';
+  }).join('') : '<p style="text-align:center;color:#888;padding:32px">아직 응원메시지가 없습니다. 첫 번째 지지자가 되어주세요!</p>';
+  var btn = document.getElementById('msg-more-btn');
+  if (btn) { if (data.length > count) { btn.style.display='block'; btn.textContent='+ 더보기 (' + (data.length - count) + '개 더)'; } else { btn.style.display='none'; } }
+}
 function loadMsgs() {
   fetch('https://duon.myds.me/election/choiwoonyong/api.php?action=list')
-    .then(r => r.json())
-    .then(d => {
+    .then(function(r){return r.json();})
+    .then(function(d) {
       if (!d.ok) return;
-      const cnt = document.getElementById('msg-count');
-      if (cnt) cnt.textContent = '총 ' + d.total + '명이 지지 선언했습니다';
-      const list = document.getElementById('msg-list');
-      if (!list) return;
-      list.innerHTML = d.data.map(m => {
-        const dt = m.created_at.substring(0,10);
-        return '<div style="background:#fff;border-radius:14px;padding:20px 24px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,52,164,0.08)">' +
-          '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">' +
-          '<div style="width:36px;height:36px;background:#1a3aab;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px">' + m.name.charAt(0) + '</div>' +
-          '<div><strong style="font-size:15px;color:#162583">' + m.name + '</strong>' +
-          (m.region ? ' <span style="font-size:12px;color:#888;background:#f0f4ff;padding:2px 8px;border-radius:4px">' + m.region + '</span>' : '') +
-          '<div style="font-size:12px;color:#aaa;margin-top:2px">' + dt + '</div></div></div>' +
-          '<p style="color:#333;font-size:15px;line-height:1.6">' + m.message.replace(/</g,'&lt;') + '</p></div>';
-      }).join('') || '<p style="text-align:center;color:#888;padding:32px">아직 응원메시지가 없습니다. 첫 번째 지지자가 되어주세요!</p>';
-    }).catch(()=>{});
+      var cnt = document.getElementById('msg-count');
+      if (cnt) cnt.textContent = '총 ' + d.total + '명이 응원했습니다';
+      msgAllData = d.data;
+      renderMsgs(msgAllData, msgShown);
+    }).catch(function(){});
 }
 loadMsgs();
 
