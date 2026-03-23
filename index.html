@@ -181,9 +181,9 @@ footer strong{color:#aaa}
     <a href="#news">보도</a>
     <a href="#blog">블로그</a>
     <a href="#gallery">포스터</a>
-    <a href="#share">지지하기</a>
+    <a href="#support">응원하기</a>
   </div>
-  <a href="#share" class="nav-cta">지지 &amp; 공유</a>
+  <a href="#support" class="nav-cta">지지 &amp; 공유</a>
 </nav>
 
 <!-- HERO — 풀 배너 슬라이더 -->
@@ -600,7 +600,7 @@ footer strong{color:#aaa}
 </section>
 
 <!-- SUPPORT MESSAGES -->
-<section style="background:#f0f4ff;padding:80px 24px" id="support">
+<section style="background:#f0f4ff;padding:80px 24px" id="support" style="scroll-margin-top:70px">
   <div style="max-width:1000px;margin:0 auto">
     <div style="display:inline-block;background:#e8f0fe;color:#0052a4;font-size:12px;font-weight:700;padding:6px 14px;border-radius:40px;letter-spacing:1px;margin-bottom:16px">SUPPORT</div>
     <h2 style="font-size:36px;font-weight:900;letter-spacing:-1.5px;margin-bottom:8px">지지선언 & 응원메시지</h2>
@@ -751,7 +751,7 @@ function playVideo(id) {
 }
 
 // 방문자 기록
-fetch('https://duon.myds.me/election/choiwoonyong/visit.php').catch(()=>{});
+fetch('visit.php').catch(()=>{});
 
 // 카운트다운
 function updateCD() {
@@ -776,7 +776,7 @@ setInterval(updateCD, 1000);
 
 // 메시지
 function loadMsgs() {
-  fetch('https://duon.myds.me/election/choiwoonyong/api.php?action=list')
+  fetch('api.php?action=list')
     .then(r => r.json())
     .then(d => {
       if (!d.ok) return;
@@ -818,7 +818,7 @@ function renderBlogPosts(data, count) {
   if (moreBtn) moreBtn.style.display = data.length > count ? 'inline-flex' : 'none';
 }
 function loadBlogPosts() {
-  fetch('https://duon.myds.me/election/choiwoonyong/blog_api.php')
+  fetch('blog_api.php')
     .then(r => r.json()).then(d => {
       var el = document.getElementById('blog-list');
       if (!el || !d.data || !d.data.length) {
@@ -856,7 +856,7 @@ function renderPublicNews(data, count) {
   if (moreBtn) moreBtn.style.display = data.length > count ? 'block' : 'none';
 }
 function loadPublicNews() {
-  fetch('https://duon.myds.me/election/choiwoonyong/crawl.php?action=list&public=1')
+  fetch('crawl.php?action=list&public=1')
     .then(r => r.json()).then(d => {
       var el = document.getElementById('news-list-public');
       if (!el) return;
@@ -880,7 +880,7 @@ function submitMsg() {
   const message = document.getElementById('f-msg').value.trim();
   if (!name) { alert('이름을 입력해주세요'); document.getElementById('f-name').focus(); return; }
   if (!message) { alert('응원메시지를 입력해주세요'); document.getElementById('f-msg').focus(); return; }
-  fetch('https://duon.myds.me/election/choiwoonyong/api.php?action=post', {
+  fetch('api.php?action=post', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({name, region, message})
