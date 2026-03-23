@@ -630,9 +630,7 @@ footer strong{color:#aaa}
     <!-- 메시지 목록 -->
     <div id="msg-count-badge" style="font-size:13px;color:#888;text-align:right;margin-bottom:8px"></div>
     <div id="msg-list" style="border-radius:12px;overflow:hidden;border:1px solid #eef2ff"></div>
-    <div style="text-align:center;margin-top:12px">
-      <button id="msg-more-btn" onclick="msgShown+=10;renderMsgs(msgAllData,msgShown)" style="display:none;padding:9px 28px;background:#f0f4ff;color:#162583;border:1px solid #c3d4ff;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer">+ 더보기</button>
-    </div>
+    <div id="msg-pagination" style="margin-top:12px"></div>
   </div>
 </section>
 
@@ -780,11 +778,15 @@ setInterval(updateCD, 1000);
 
 // 메시지
 var msgAllData = [];
-var msgShown = 10;
-function renderMsgs(data, count) {
+var msgPage = 1;
+var msgPerPage = 10;
+function renderMsgs(data, page) {
   var list = document.getElementById('msg-list');
   if (!list) return;
-  var items = data.slice(0, count);
+  var total = data.length;
+  var totalPages = Math.ceil(total / msgPerPage);
+  var start = (page - 1) * msgPerPage;
+  var items = data.slice(start, start + msgPerPage);
   list.innerHTML = items.length ? items.map(function(m) {
     var dt = m.created_at.substring(0,10);
     var initial = m.name.charAt(0);
@@ -797,8 +799,28 @@ function renderMsgs(data, count) {
       '<span style="font-size:11px;color:#bbb;white-space:nowrap;flex-shrink:0">' + dt + '</span>' +
       '</div>';
   }).join('') : '<p style="text-align:center;color:#888;padding:32px">아직 응원메시지가 없습니다. 첫 번째 지지자가 되어주세요!</p>';
-  var btn = document.getElementById('msg-more-btn');
-  if (btn) { if (data.length > count) { btn.style.display='block'; btn.textContent='+ 더보기 (' + (data.length - count) + '개 더)'; } else { btn.style.display='none'; } }
+  // 페이지네이션 렌더링
+  var pg = document.getElementById('msg-pagination');
+  if (pg) {
+    if (totalPages <= 1) { pg.innerHTML = ''; return; }
+    var btns = '';
+    btns += '<button onclick="changeMsgPage(' + (page-1) + ')" ' + (page<=1?'disabled':'') + ' style="padding:6px 12px;border:1px solid #c3d4ff;border-radius:6px;background:#fff;color:#162583;cursor:pointer;font-size:13px' + (page<=1?';opacity:0.4':'') + '">&#8249;</button>';
+    var start_p = Math.max(1, page-2), end_p = Math.min(totalPages, page+2);
+    for (var i=start_p; i<=end_p; i++) {
+      var active = i===page;
+      btns += '<button onclick="changeMsgPage(' + i + ')" style="padding:6px 12px;border:1px solid ' + (active?'#162583':'#c3d4ff') + ';border-radius:6px;background:' + (active?'#162583':'#fff') + ';color:' + (active?'#fff':'#162583') + ';cursor:pointer;font-size:13px;font-weight:' + (active?'700':'400') + '">' + i + '</button>';
+    }
+    btns += '<button onclick="changeMsgPage(' + (page+1) + ')" ' + (page>=totalPages?'disabled':'') + ' style="padding:6px 12px;border:1px solid #c3d4ff;border-radius:6px;background:#fff;color:#162583;cursor:pointer;font-size:13px' + (page>=totalPages?';opacity:0.4':'') + '">&#8250;</button>';
+    btns += '<span style="font-size:12px;color:#aaa;margin-left:8px">' + page + ' / ' + totalPages + ' 페이지 (총 ' + total + '명)</span>';
+    pg.innerHTML = '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">' + btns + '</div>';
+  }
+}
+function changeMsgPage(p) {
+  var totalPages = Math.ceil(msgAllData.length / msgPerPage);
+  if (p < 1 || p > totalPages) return;
+  msgPage = p;
+  renderMsgs(msgAllData, msgPage);
+  document.getElementById('support') && document.getElementById('support').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function loadMsgs() {
   fetch('https://duon.myds.me/election/choiwoonyong/api.php?action=list')
@@ -808,7 +830,7 @@ function loadMsgs() {
       var cnt = document.getElementById('msg-count');
       if (cnt) cnt.textContent = '총 ' + d.total + '명이 응원했습니다';
       msgAllData = d.data;
-      renderMsgs(msgAllData, msgShown);
+      renderMsgs(msgAllData, msgPage);
     }).catch(function(){});
 }
 loadMsgs();
