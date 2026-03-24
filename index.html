@@ -550,19 +550,19 @@ function showRegion(name, btn) {
     <!-- 권역별 공약 포스터 -->
     <h3 style="font-size:20px;font-weight:800;color:#162583;margin:40px 0 16px;letter-spacing:-0.5px">권역별 공약 포스터</h3>
     <div class="gallery-grid">
-      <div class="gallery-card" onclick="openPoster('https://duon.myds.me/election/choiwoonyong/poster-nambu.jpg','남부권 공약')">
+      <div class="gallery-card" onclick="openPoster('poster-nambu.jpg','남부권 공약')">
         <img src="https://duon.myds.me/election/choiwoonyong/poster-nambu.jpg" alt="남부권 공약">
         <div class="gallery-label">남부권 — 혁신으로 성장하는 남부권</div>
       </div>
-      <div class="gallery-card" onclick="openPoster('https://duon.myds.me/election/choiwoonyong/poster-seobu.jpg','서부권 공약')">
+      <div class="gallery-card" onclick="openPoster('poster-seobu.jpg','서부권 공약')">
         <img src="https://duon.myds.me/election/choiwoonyong/poster-seobu.jpg" alt="서부권 공약">
         <div class="gallery-label">서부권 — 평택 대도약의 중심</div>
       </div>
-      <div class="gallery-card" onclick="openPoster('https://duon.myds.me/election/choiwoonyong/poster-bukbu.jpg','북부권 공약')">
+      <div class="gallery-card" onclick="openPoster('poster-bukbu.jpg','북부권 공약')">
         <img src="https://duon.myds.me/election/choiwoonyong/poster-bukbu.jpg" alt="북부권 공약">
         <div class="gallery-label">북부권 — 신성장을 견인하는 정주도시</div>
       </div>
-      <div class="gallery-card" onclick="openPoster('https://duon.myds.me/election/choiwoonyong/poster-godeok.jpg','고덕-지제 공약')">
+      <div class="gallery-card" onclick="openPoster('poster-godeok.jpg','고덕-지제 공약')">
         <img src="https://duon.myds.me/election/choiwoonyong/poster-godeok.jpg" alt="고덕-지제 공약">
         <div class="gallery-label">고덕·지제 — 실리콘밸리처럼 키우겠습니다</div>
       </div>
@@ -1118,8 +1118,32 @@ function shareAfterCopy() {
 </div>
 
 <script>
-// 방송출연 팝업 비활성화 (2026-03-24)
-// (function() { popup disabled })();
+// DB 기반 팝업
+(function() {
+  fetch('https://duon.myds.me/election/choiwoonyong/popup_api.php?action=get')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if (!d.popup) return;
+      var p = d.popup;
+      var popup = document.getElementById('broadcast-popup');
+      var img = popup.querySelector('img');
+      if (img) img.src = p.image_url;
+      if (p.link_url) img.style.cursor = 'pointer', img.onclick = function(){ window.open(p.link_url,'_blank'); };
+      var key = 'popup_hide_' + p.id;
+      var hidden = localStorage.getItem(key);
+      if (!hidden || new Date().toDateString() !== hidden) {
+        popup.style.display = 'flex';
+      }
+      // 오늘하루보지않기 - 팝업 ID 기반
+      var origClose = window.closePopup;
+      window.closePopup = function() {
+        if (document.getElementById('popup-hide-today').checked) {
+          localStorage.setItem('popup_hide_' + p.id, new Date().toDateString());
+        }
+        popup.style.display = 'none';
+      };
+    }).catch(function(){});
+})();
 function closePopup() {
   var popup = document.getElementById('broadcast-popup');
   if (document.getElementById('popup-hide-today').checked) {
