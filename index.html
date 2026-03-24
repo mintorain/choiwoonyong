@@ -11,6 +11,14 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:type" content="website">
+<!-- 구글 검색 등록 -->
+<meta name="robots" content="index, follow">
+<meta name="googlebot" content="index, follow">
+<!-- 네이버 검색 등록 (서치어드바이저 인증 후 실제 코드로 교체) -->
+<meta name="naver-site-verification" content="NAVER_CODE_HERE">
+<!-- 사이트 설명 -->
+<meta name="author" content="최원용 선거사무소">
+<link rel="canonical" href="https://choiwoonyong.vercel.app">
 <meta property="og:url" content="https://duon.myds.me/election/choiwoonyong/">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary_large_image">
@@ -1048,7 +1056,7 @@ function submitMsg() {
 }
 
 function shareKakao() {
-  const url = 'https://duon.myds.me/election/choiwoonyong/';
+  const url = 'https://choiwoonyong.vercel.app';
   const title = '평택을 바꾸는 힘 있는 선택 — 최원용';
   const text = '이재명 시대 평택은 최원용. 30년 검증된 행정 전문가가 평택시장에 도전합니다.';
   if (navigator.share) {
