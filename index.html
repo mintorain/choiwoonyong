@@ -458,8 +458,46 @@ footer strong{color:#aaa}
         <div class="gallery-label">교육 공약</div>
       </div>
     </div>
+
+    <!-- 권역별 공약 포스터 -->
+    <h3 style="font-size:20px;font-weight:800;color:#162583;margin:40px 0 16px;letter-spacing:-0.5px">권역별 공약 포스터</h3>
+    <div class="gallery-grid">
+      <div class="gallery-card" onclick="openPoster('https://duon.myds.me/election/choiwoonyong/poster-nambu.jpg','남부권 공약')">
+        <img src="https://duon.myds.me/election/choiwoonyong/poster-nambu.jpg" alt="남부권 공약">
+        <div class="gallery-label">남부권 — 혁신으로 성장하는 남부권</div>
+      </div>
+      <div class="gallery-card" onclick="openPoster('https://duon.myds.me/election/choiwoonyong/poster-seobu.jpg','서부권 공약')">
+        <img src="https://duon.myds.me/election/choiwoonyong/poster-seobu.jpg" alt="서부권 공약">
+        <div class="gallery-label">서부권 — 평택 대도약의 중심</div>
+      </div>
+      <div class="gallery-card" onclick="openPoster('https://duon.myds.me/election/choiwoonyong/poster-bukbu.jpg','북부권 공약')">
+        <img src="https://duon.myds.me/election/choiwoonyong/poster-bukbu.jpg" alt="북부권 공약">
+        <div class="gallery-label">북부권 — 신성장을 견인하는 정주도시</div>
+      </div>
+      <div class="gallery-card" onclick="openPoster('https://duon.myds.me/election/choiwoonyong/poster-godeok.jpg','고덕-지제 공약')">
+        <img src="https://duon.myds.me/election/choiwoonyong/poster-godeok.jpg" alt="고덕-지제 공약">
+        <div class="gallery-label">고덕·지제 — 실리콘밸리처럼 키우겠습니다</div>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- 포스터 라이트박스 -->
+<div id="poster-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99998;align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
+  <div style="position:relative;max-width:500px;width:92%">
+    <img id="poster-lightbox-img" src="" alt="" style="width:100%;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.5)">
+    <button onclick="document.getElementById('poster-lightbox').style.display='none'" style="position:absolute;top:-16px;right:-16px;width:36px;height:36px;border-radius:50%;background:#fff;border:none;font-size:20px;cursor:pointer;font-weight:700;color:#333;line-height:1">&times;</button>
+  </div>
+</div>
+
+<script>
+function openPoster(src, alt) {
+  var lb = document.getElementById('poster-lightbox');
+  var img = document.getElementById('poster-lightbox-img');
+  img.src = src; img.alt = alt;
+  lb.style.display = 'flex';
+}
+</script>
 
 
 
@@ -753,7 +791,7 @@ function playVideo(id) {
 }
 
 // 방문자 기록
-fetch('https://duon.myds.me/election/choiwoonyong/visit.php').catch(()=>{});
+fetch('visit.php').catch(()=>{});
 
 // 카운트다운
 function updateCD() {
@@ -855,7 +893,7 @@ function renderBlogPosts(data, count) {
   if (moreBtn) moreBtn.style.display = data.length > count ? 'inline-flex' : 'none';
 }
 function loadBlogPosts() {
-  fetch('https://duon.myds.me/election/choiwoonyong/blog_api.php')
+  fetch('blog_api.php')
     .then(r => r.json()).then(d => {
       var el = document.getElementById('blog-list');
       if (!el || !d.data || !d.data.length) {
