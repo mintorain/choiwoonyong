@@ -600,47 +600,15 @@ function openPoster(src, alt) {
     <!-- 메인 영상 -->
     <div id="main-player" style="border-radius:16px;overflow:hidden;aspect-ratio:16/9;background:#000;margin-bottom:20px;box-shadow:0 12px 40px rgba(0,0,0,0.5)">
       <iframe id="yt-iframe" width="100%" height="100%"
-        src="https://www.youtube.com/embed/Bn61peqNiUg?rel=0&modestbranding=1"
+        id="yt-iframe" src="https://www.youtube.com/embed/oDdKRTa8AFQ?rel=0&modestbranding=1"
         title="최원용TV" frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen style="display:block"></iframe>
     </div>
 
     <!-- 썸네일 그리드 -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
-      
-      <div onclick="playVideo('wvaAHAz4thg')" style="cursor:pointer;border-radius:10px;overflow:hidden;position:relative;aspect-ratio:16/9;background:#000">
-        <img src="https://img.youtube.com/vi/wvaAHAz4thg/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
-          <div style="width:40px;height:40px;background:rgba(0,0,0,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-          </div>
-        </div>
-      </div>
-      <div onclick="playVideo('spE1Ln2Bwmg')" style="cursor:pointer;border-radius:10px;overflow:hidden;position:relative;aspect-ratio:16/9;background:#000">
-        <img src="https://img.youtube.com/vi/spE1Ln2Bwmg/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
-          <div style="width:40px;height:40px;background:rgba(0,0,0,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-          </div>
-        </div>
-      </div>
-      <div onclick="playVideo('QWaSxkFN35U')" style="cursor:pointer;border-radius:10px;overflow:hidden;position:relative;aspect-ratio:16/9;background:#000">
-        <img src="https://img.youtube.com/vi/QWaSxkFN35U/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
-          <div style="width:40px;height:40px;background:rgba(0,0,0,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-          </div>
-        </div>
-      </div>
-      <div onclick="playVideo('DFHbuDR4NnY')" style="cursor:pointer;border-radius:10px;overflow:hidden;position:relative;aspect-ratio:16/9;background:#000">
-        <img src="https://img.youtube.com/vi/DFHbuDR4NnY/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
-          <div style="width:40px;height:40px;background:rgba(0,0,0,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-          </div>
-        </div>
-      </div>
+    <div id="yt-thumb-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+      <p style="color:rgba(255,255,255,0.4);font-size:13px;grid-column:1/-1;padding:8px">영상 로딩 중...</p>
     </div>
 
     <div style="text-align:center">
@@ -874,6 +842,31 @@ function copyLink() {
   });
 }
 // 영상 플레이어 전환
+
+// ── 유튜브 최신 영상 로드 ─────────────────────────────────────
+function loadYouTube() {
+  fetch('https://duon.myds.me/election/choiwoonyong/youtube_api.php')
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if (!d.data || !d.data.length) return;
+      // 메인 플레이어 첫 영상으로
+      var first = d.data[0];
+      var iframe = document.getElementById('yt-iframe');
+      if (iframe) iframe.src = 'https://www.youtube.com/embed/' + first.video_id + '?rel=0&modestbranding=1';
+      // 썸네일 그리드
+      var grid = document.getElementById('yt-thumb-grid');
+      if (!grid) return;
+      grid.innerHTML = d.data.slice(1).map(function(v) {
+        return '<div onclick="playVideo(\'' + v.video_id + '\')" style="cursor:pointer;border-radius:10px;overflow:hidden;position:relative;aspect-ratio:16/9;background:#000">' +
+          '<img src="https://i.ytimg.com/vi/' + v.video_id + '/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover;opacity:.85">' +
+          '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3)">' +
+          '<svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>' +
+          '</div>';
+      }).join('');
+    }).catch(function(){});
+}
+document.addEventListener('DOMContentLoaded', loadYouTube);
+
 function playVideo(id) {
   document.getElementById('yt-iframe').src = 'https://www.youtube.com/embed/' + id + '?rel=0&modestbranding=1&autoplay=1';
 }
