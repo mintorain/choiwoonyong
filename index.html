@@ -1118,14 +1118,8 @@ function shareAfterCopy() {
 </div>
 
 <script>
-(function() {
-  var key = 'popup_hide_broadcast';
-  var hidden = localStorage.getItem(key);
-  if (!hidden || new Date().toDateString() !== hidden) {
-    var popup = document.getElementById('broadcast-popup');
-    popup.style.display = 'flex';
-  }
-})();
+// 방송출연 팝업 비활성화 (2026-03-24)
+// (function() { popup disabled })();
 function closePopup() {
   var popup = document.getElementById('broadcast-popup');
   if (document.getElementById('popup-hide-today').checked) {
